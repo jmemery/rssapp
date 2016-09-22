@@ -1,0 +1,86 @@
+PODS:
+  - AFNetworking (2.5.0):
+    - AFNetworking/NSURLConnection (= 2.5.0)
+    - AFNetworking/NSURLSession (= 2.5.0)
+    - AFNetworking/Reachability (= 2.5.0)
+    - AFNetworking/Security (= 2.5.0)
+    - AFNetworking/Serialization (= 2.5.0)
+    - AFNetworking/UIKit (= 2.5.0)
+  - AFNetworking/NSURLConnection (2.5.0):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.5.0):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (2.5.0)
+  - AFNetworking/Security (2.5.0)
+  - AFNetworking/Serialization (2.5.0)
+  - AFNetworking/UIKit (2.5.0):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - MRProgress (0.8.0):
+    - MRProgress/ActivityIndicator (= 0.8.0)
+    - MRProgress/Blur (= 0.8.0)
+    - MRProgress/Circular (= 0.8.0)
+    - MRProgress/Icons (= 0.8.0)
+    - MRProgress/NavigationBarProgress (= 0.8.0)
+    - MRProgress/Overlay (= 0.8.0)
+  - MRProgress/ActivityIndicator (0.8.0):
+    - MRProgress/Stopable
+  - MRProgress/Blur (0.8.0):
+    - MRProgress/Helper
+  - MRProgress/Circular (0.8.0):
+    - MRProgress/Helper
+    - MRProgress/ProgressBaseClass
+    - MRProgress/Stopable
+  - MRProgress/Helper (0.8.0)
+  - MRProgress/Icons (0.8.0)
+  - MRProgress/NavigationBarProgress (0.8.0):
+    - MRProgress/ProgressBaseClass
+  - MRProgress/Overlay (0.8.0):
+    - MRProgress/ActivityIndicator
+    - MRProgress/Blur
+    - MRProgress/Circular
+    - MRProgress/Helper
+    - MRProgress/Icons
+  - MRProgress/ProgressBaseClass (0.8.0)
+  - MRProgress/Stopable (0.8.0):
+    - MRProgress/Helper
+  - MWFeedParser (1.0.1):
+    - MWFeedParser/FeedParser (= 1.0.1)
+    - MWFeedParser/NSDate+InternetDateTime (= 1.0.1)
+    - MWFeedParser/NSString+HTML (= 1.0.1)
+  - MWFeedParser/FeedParser (1.0.1):
+    - MWFeedParser/NSDate+InternetDateTime
+    - MWFeedParser/NSString+HTML
+  - MWFeedParser/NSDate+InternetDateTime (1.0.1)
+  - MWFeedParser/NSString+HTML (1.0.1)
+  - REMenu (1.10)
+  - SDWebImage (HEAD based on 3.7.2):
+    - SDWebImage/Core (= HEAD based on 3.7.2)
+  - SDWebImage/Core (HEAD based on 3.7.2)
+  - SWRevealViewController (2.3.0)
+  - UIActivityIndicator-for-SDWebImage (1.2):
+    - SDWebImage (~> 3.7)
+
+DEPENDENCIES:
+  - AFNetworking
+  - MRProgress
+  - MWFeedParser
+  - REMenu
+  - SDWebImage (HEAD)
+  - SWRevealViewController
+  - UIActivityIndicator-for-SDWebImage
+
+SPEC CHECKSUMS:
+  AFNetworking: 96ac9bf3eda33582701cb1fcc5b896aa1e20311e
+  MRProgress: 43bed03f7a1919add87aa583678c8ea244c1cd0d
+  MWFeedParser: 2cf646014c1baf6ad1b08c480b40a08180079247
+  REMenu: 30dad195930adf6c5eeb8041e3257aa60bf9fa49
+  SDWebImage: 71b7cdc1d1721d6a82ed62889030225f2c249e29
+  SWRevealViewController: 6d3fd97f70112fd7cef9de14df4260eacce4c63a
+  UIActivityIndicator-for-SDWebImage: 7bf7ebbf0ed1747dedc0d6e949c4603a6d0f9e0c
+
+COCOAPODS: 0.36.3
