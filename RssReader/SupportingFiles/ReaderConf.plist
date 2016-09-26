@@ -7,9 +7,9 @@
 	<key>DropdownMenu</key>
 	<true/>
 	<key>HomeScreenAdsEnabled</key>
-	<true/>
+	<false/>
 	<key>DetailViewAdsEnabled</key>
-	<true/>
+	<false/>
 	<key>AdmobAppId</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>AdmobAdUnitId</key>
