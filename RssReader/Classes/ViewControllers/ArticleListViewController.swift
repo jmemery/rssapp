@@ -7,9 +7,9 @@
 //
 
 import UIKit
-import iAd
+import GoogleMobileAds
 
-class ArticleListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, MenuViewDelegate, ADBannerViewDelegate {
+class ArticleListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, MenuViewDelegate, GADBannerViewDelegate {
 
     @IBOutlet weak var headerView:ArticleListHeaderView!
     @IBOutlet weak var tableView:UITableView!
@@ -32,8 +32,15 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
     private var articles:[Article] = []
     
     // Ad Banner
-    var adBannerView:ADBannerView?
-    var isAdDisplayed = false
+    lazy var adBannerView: GADBannerView? = {
+        let adBannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
+        adBannerView.adUnitID = ConfigurationManager.admobAdUnitId()
+        adBannerView.delegate = self
+        adBannerView.rootViewController = self
+        
+        return adBannerView
+    }()
+    
     private var isDragged = false
     
     var currentFeeds: (title: String, url: String)? {
@@ -110,8 +117,7 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
 
         // Enable Ad (depending on the settings)
         if ConfigurationManager.isHomeScreenAdsEnabled() {
-            adBannerView = ADBannerView(adType: ADAdType.Banner)
-            adBannerView?.delegate = self
+            adBannerView?.loadRequest(GADRequest())
         }
         
     }
@@ -132,7 +138,8 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         // Return the number of rows in the section.
         return (articles.count > 0) ? articles.count : 0
     }
-    
+ 
+    /*
     func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         if !ConfigurationManager.isHomeScreenAdsEnabled() {
             return nil
@@ -146,7 +153,9 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         
         return adBannerView
     }
+    */
     
+    /*
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
         // 1. The ad banner is only displayed in the first section (i.e. section #0). For the
@@ -163,7 +172,7 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         
         return bannerView.frame.size.height
     }
-    
+    */
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
@@ -493,23 +502,30 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         currentFeeds = (title: feed["name"]!, url: feed["url"]!)
     }
 
-    // MARK: - AdBannerViewDelegate Methods
+
+    // MARK: - Google Admob
     
-    func bannerViewDidLoadAd(banner: ADBannerView!) {
-        isAdDisplayed = true
+    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+        print("Banner loaded successfully")
         
-        // Reload table section to show the banner ad
-        let indexSet = NSIndexSet(index: 0)
-        tableView.reloadSections(indexSet, withRowAnimation: .Automatic)
+        // Reset the content offset
+        tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
+        
+        // Reposition the banner ad to create a slide down effect
+        let translateTransform = CGAffineTransformMakeTranslation(0, -bannerView.bounds.size.height)
+        bannerView.transform = translateTransform
+        
+        UIView.animateWithDuration(0.5) {
+            self.tableView.tableHeaderView?.frame = bannerView.frame
+            bannerView.transform = CGAffineTransformIdentity
+            self.tableView.tableHeaderView = bannerView
+        }
+        
     }
     
-    func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {
-        print(error.localizedDescription)
-        isAdDisplayed = false
-        
-        // Reload table section to hide the banner ad
-        let indexSet = NSIndexSet(index: 0)
-        tableView.reloadSections(indexSet, withRowAnimation: .Automatic)
+    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+        print("Fail to receive ads")
+        print(error)
     }
 
 }

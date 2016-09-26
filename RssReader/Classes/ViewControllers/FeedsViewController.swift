@@ -7,9 +7,9 @@
 //
 
 import UIKit
+import GoogleMobileAds
 
-
-class FeedsViewController: UITableViewController {
+class FeedsViewController: UITableViewController, GADBannerViewDelegate {
     @IBOutlet var navigationHeaderButton: UIButton!
     var navigationHeaderLabel:UILabel?
     
@@ -186,6 +186,16 @@ class FeedsViewController: UITableViewController {
         return FeedsService()
     }()
     
+    lazy var adBannerView: GADBannerView? = {
+        let adBannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
+        adBannerView.adUnitID = ConfigurationManager.admobAdUnitId()
+        adBannerView.delegate = self
+        adBannerView.rootViewController = self
+
+        return adBannerView
+    }()
+    
+    
     // MARK: - ViewController overrides
     override func viewDidLoad() {
         super.viewDidLoad();
@@ -254,7 +264,9 @@ class FeedsViewController: UITableViewController {
         tableView.dataSource = self.dataSource
         
         // Enable Ad (depending on the settings)
-        canDisplayBannerAds = ConfigurationManager.isHomeScreenAdsEnabled()
+        if ConfigurationManager.isHomeScreenAdsEnabled() {
+            print("Google Mobile Ads SDK version: \(GADRequest.sdkVersion())")
+        }
 
         // Enable self sizing cells
         self.tableView.rowHeight = UITableViewAutomaticDimension
@@ -325,6 +337,13 @@ class FeedsViewController: UITableViewController {
                 self.navigationHeaderButton?.setTitle(menuTitle + " ▾", forState: UIControlState.Normal)
                 self.navigationHeaderLabel?.text = menuTitle
             }
+            
+            // Enable banner ad
+            if ConfigurationManager.isHomeScreenAdsEnabled() {
+                self.adBannerView?.loadRequest(GADRequest())
+                print("Request ad banner")
+                print("Ad unit ID: \(self.adBannerView?.adUnitID)")
+            }
 
         }) { (error: NSError) -> (Void) in
             print("Error: \(error.localizedDescription)", terminator: "")
@@ -344,6 +363,7 @@ class FeedsViewController: UITableViewController {
                 }
             }
         }
+        
     }
     
     // Action method when the user triggers a refresh
@@ -377,6 +397,7 @@ class FeedsViewController: UITableViewController {
                 }
             }
         }
+
     }
     
     @IBAction func unwindToFeedScreen(segue: UIStoryboardSegue) {
@@ -385,5 +406,28 @@ class FeedsViewController: UITableViewController {
         }
     }
     
+    // MARK: - Google Admob
+    
+    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+        print("Banner loaded successfully")
 
+        // Reset the content offset
+        tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
+
+        // Reposition the banner ad to create a slide down effect
+        let translateTransform = CGAffineTransformMakeTranslation(0, -bannerView.bounds.size.height)
+        bannerView.transform = translateTransform
+        
+        UIView.animateWithDuration(0.5) {
+            self.tableView.tableHeaderView?.frame = bannerView.frame
+            bannerView.transform = CGAffineTransformIdentity
+            self.tableView.tableHeaderView = bannerView
+        }
+
+    }
+    
+    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+        print("Fail to receive ads")
+        print(error)
+    }
 }

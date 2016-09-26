@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import GoogleMobileAds
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -54,6 +55,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 UILabel.appearance().font = ConfigurationManager.defaultCellFont() != "default" ? UIFont(name: "Raleway", size: 14.0) : UIFont(name: ConfigurationManager.defaultCellFont(), size: 14.0)
             }
         }
+        
+        // Setup AdMob
+        if ConfigurationManager.isHomeScreenAdsEnabled() || ConfigurationManager.isDetailViewAdsEnabled() {
+            
+            GADMobileAds.configureWithApplicationID(ConfigurationManager.admobAppId())
+        }
+        
         
         return true
     }

@@ -47,25 +47,26 @@ class SettingViewController: UITableViewController, MFMailComposeViewControllerD
     
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
         
-        switch result.rawValue {
-        case MFMailComposeResultCancelled.rawValue:
+        switch result {
+        case MFMailComposeResult.Cancelled:
             print("Mail cancelled")
             
-        case MFMailComposeResultSaved.rawValue:
+        case MFMailComposeResult.Saved:
             print("Mail saved")
             
-        case MFMailComposeResultSent.rawValue:
+        case MFMailComposeResult.Sent:
             print("Mail sent")
             
-        case MFMailComposeResultFailed.rawValue:
+        case MFMailComposeResult.Failed:
             print("Failed to send mail: \(error!.localizedDescription)")
-            
-        default:
-            break
         }
         
         // Dismiss the Mail interface
         dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 75.0
     }
     
     @IBAction func dismissController() {

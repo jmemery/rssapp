@@ -23,7 +23,7 @@ class SlideUpTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning
         let toView = transitionContext.viewForKey(UITransitionContextToViewKey)!
         
         // Set up the transform we'll use in the animation
-        let container = transitionContext.containerView()!
+        let container = transitionContext.containerView()
         let offScreenDown = CGAffineTransformMakeTranslation(0, container.frame.height)
         
         let shiftDown = CGAffineTransformMakeTranslation(0, 15)

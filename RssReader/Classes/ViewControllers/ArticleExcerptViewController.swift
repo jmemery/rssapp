@@ -7,11 +7,11 @@
 //
 
 import UIKit
-import iAd
+import GoogleMobileAds
 
 let ARTICLE_EXCERPT_LIMIT = 14896
 
-class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UITextViewDelegate, ADBannerViewDelegate {
+class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIScrollViewDelegate, UITextViewDelegate, GADBannerViewDelegate {
     @IBOutlet weak var tableView:UITableView!
     @IBOutlet weak var headerView:ArticleHeaderView!
 
@@ -28,8 +28,16 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     private var tappedLink:String = ""
 
     // Ad Banner
-    var adBannerView:ADBannerView?
-    var isAdDisplayed = false
+    lazy var adBannerView: GADBannerView? = {
+        let adBannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
+        adBannerView.adUnitID = ConfigurationManager.admobAdUnitId()
+        adBannerView.delegate = self
+        adBannerView.rootViewController = self
+        
+        return adBannerView
+    }()
+
+    
     private var isDragged = false
     
     override func viewDidLoad() {
@@ -71,8 +79,9 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         
         // Enable Ad (depending on the settings)
         if ConfigurationManager.isDetailViewAdsEnabled() {
-            adBannerView = ADBannerView(adType: ADAdType.Banner)
-            adBannerView?.delegate = self
+//            adBannerView = ADBannerView(adType: ADAdType.Banner)
+//            adBannerView?.delegate = self
+            adBannerView?.loadRequest(GADRequest())
         }
     }
     
@@ -166,36 +175,6 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         return 1
     }
     
-    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if !ConfigurationManager.isDetailViewAdsEnabled() {
-            return nil
-        }
-        
-        // The ad banner is only displayed in the second section (i.e. section #1). For the
-        // rest of the sections, a nil is returned.
-        if section != 1 {
-            return nil
-        }
-        
-        return adBannerView
-    }
-    
-    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        
-        // 1. The ad banner is only displayed in the second section (i.e. section #1). For the
-        //    rest of the sections, we return a height of zero.
-        // 2. If the ad banner can't be loaded (i.e. isAdDisplayed sets to false), we also return
-        //    a height of zero.
-        if section != 1 || !isAdDisplayed {
-            return 0.0
-        }
-        
-        guard let bannerView = adBannerView else {
-            return 0.0
-        }
-        
-        return bannerView.frame.size.height
-    }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
@@ -223,7 +202,7 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
             
             // The article description is originally in HTML format. Here we call up
             // the stringByFormattingHTMLString() to generate the attributed string.
-            let textDescription = articleDescription?.stringByFormattingHTMLString(imageCompletionHandler: { (range, string) -> Void in
+            let textDescription = articleDescription?.stringByFormattingHTMLString({ (range, string) -> Void in
 
                 NSOperationQueue.mainQueue().addOperationWithBlock({
 
@@ -341,7 +320,7 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     // MARK: - UITextViewDelegate
     func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
         
-        tappedLink = URL.absoluteString
+        tappedLink = URL.absoluteString!
         performSegueWithIdentifier("showLink", sender: self)
 
         return false
@@ -358,23 +337,31 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         }
     }
 
-    // MARK: - AdBannerViewDelegate Methods
     
-    func bannerViewDidLoadAd(banner: ADBannerView!) {
-        isAdDisplayed = true
+    // MARK: - Google Admob
+    
+    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+        print("Banner loaded successfully")
         
-        // Reload table section to show the banner ad
-        let indexSet = NSIndexSet(index: 0)
-        tableView.reloadSections(indexSet, withRowAnimation: .Automatic)
+        // Reset the content offset
+        tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
+        
+        // Reposition the banner ad to create a slide down effect
+        let translateTransform = CGAffineTransformMakeTranslation(bannerView.bounds.size.width, 0)
+        bannerView.transform = translateTransform
+        
+        UIView.animateWithDuration(0.3) {
+            self.tableView.tableHeaderView?.frame = bannerView.frame
+            bannerView.transform = CGAffineTransformIdentity
+            self.tableView.tableHeaderView = bannerView
+        }
+        
+    }
+    
+    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+        print("Fail to receive ads")
+        print(error)
     }
 
-    func bannerView(banner: ADBannerView!, didFailToReceiveAdWithError error: NSError!) {
-        print(error.localizedDescription)
-        isAdDisplayed = false
-        
-        // Reload table section to hide the banner ad
-        let indexSet = NSIndexSet(index: 0)
-        tableView.reloadSections(indexSet, withRowAnimation: .Automatic)
-    }
 }
 

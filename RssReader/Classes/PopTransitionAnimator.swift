@@ -26,7 +26,7 @@ class PopTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning, UI
         toView.frame = fromView.bounds
         
         // Set up the transform we'll use in the animation
-        let container = transitionContext.containerView()!
+        let container = transitionContext.containerView()
         let minimize = CGAffineTransformMakeScale(0, 0)
         let offScreenDown = CGAffineTransformMakeTranslation(0, container.frame.height)
         

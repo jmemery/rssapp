@@ -107,7 +107,7 @@ extension String {
         return decodedString
     }
     
-    func stringByFormattingHTMLString(imageCompletionHandler imageCompletionHandler: (range: NSRange, string: NSAttributedString) -> Void) -> NSAttributedString {
+    func stringByFormattingHTMLString(imageCompletionHandler: (range: NSRange, string: NSAttributedString) -> Void) -> NSAttributedString {
         
         // Remove the first image as it is displayed in the header view
         var htmlString = removeFirstImageFromHTML()
@@ -203,7 +203,7 @@ extension String {
 
                         let imageAttachment = ImageAttachment()
                         imageAttachment.image = UIImage()
-                        imageAttachment.imageURL = imageURL.absoluteString
+                        imageAttachment.imageURL = imageURL.absoluteString!
                         let attrStringWithImage = NSAttributedString(attachment: imageAttachment)
                         attributedHTMLString.insertAttributedString(attrStringWithImage, atIndex: match.rangeAtIndex(0).location + index)
                         

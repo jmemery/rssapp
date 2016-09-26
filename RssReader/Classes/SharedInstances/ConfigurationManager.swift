@@ -84,6 +84,14 @@ class ConfigurationManager: NSObject {
         
         return "Dark"
     }
+    
+    class func admobAppId() -> String {
+        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("AdmobAppId") as! String
+    }
+    
+    class func admobAdUnitId() -> String {
+        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("AdmobAdUnitId") as! String
+    }
 
 }
 

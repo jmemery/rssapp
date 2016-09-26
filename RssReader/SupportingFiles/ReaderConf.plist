@@ -7,9 +7,13 @@
 	<key>DropdownMenu</key>
 	<true/>
 	<key>HomeScreenAdsEnabled</key>
-	<false/>
+	<true/>
 	<key>DetailViewAdsEnabled</key>
-	<false/>
+	<true/>
+	<key>AdmobAppId</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>AdmobAdUnitId</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
 	<key>DefaultBarFont</key>
 	<string>Raleway</string>
 	<key>DefaultCellFont</key>
@@ -152,9 +156,9 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Punnode</string>
+			<string>PanX.asia</string>
 			<key>url</key>
-			<string>http://punnode.com/feed/</string>
+			<string>https://panx.asia/feed</string>
 		</dict>
 		<dict>
 			<key>name</key>
@@ -194,9 +198,9 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Mr Jamie</string>
+			<string>立場新聞</string>
 			<key>url</key>
-			<string>http://feeds.feedburner.com/MrJamie?format=xml</string>
+			<string>https://www.thestandnews.com/rss/</string>
 		</dict>
 		<dict>
 			<key>name</key>
@@ -240,12 +244,12 @@
 			<key>url</key>
 			<string>http://heroichollywood.com/home-1?format=RSS</string>
 		</dict>
-        <dict>
-        <key>name</key>
-        <string>Newsgroup</string>
-        <key>url</key>
-        <string>http://www.reduser.net/forum/external.php?type=RSS2&amp;forumids=19</string>
-        </dict>
+		<dict>
+			<key>name</key>
+			<string>Newsgroup</string>
+			<key>url</key>
+			<string>http://www.reduser.net/forum/external.php?type=RSS2&amp;forumids=19</string>
+		</dict>
 	</array>
 	<key>CategoryFeeds</key>
 	<dict>
@@ -308,24 +312,24 @@
 				<key>url</key>
 				<string>http://guykawasaki.com/feed/</string>
 			</dict>
-            <dict>
-                <key>name</key>
-                <string>Aristeguinoticias</string>
-                <key>url</key>
-                <string>http://feeds.feedburner.com/AristeguiNoticias</string>
-            </dict>
-            <dict>
-                <key>name</key>
-                <string>Eluniversal MX</string>
-                <key>url</key>
-                <string>http://www.eluniversal.com.mx/rss/universalmxm.xml</string>
-            </dict>
-            <dict>
-                <key>name</key>
-                <string>CNN</string>
-                <key>url</key>
-                <string>http://feeds2.feedburner.com/cnnexpansion/portada</string>
-            </dict>
+			<dict>
+				<key>name</key>
+				<string>Aristeguinoticias</string>
+				<key>url</key>
+				<string>http://feeds.feedburner.com/AristeguiNoticias</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>Eluniversal MX</string>
+				<key>url</key>
+				<string>http://www.eluniversal.com.mx/rss/universalmxm.xml</string>
+			</dict>
+			<dict>
+				<key>name</key>
+				<string>CNN</string>
+				<key>url</key>
+				<string>http://feeds2.feedburner.com/cnnexpansion/portada</string>
+			</dict>
 		</array>
 	</dict>
 </dict>

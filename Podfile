@@ -6,13 +6,15 @@ inhibit_all_warnings!
 platform :ios, '7.0'
 
 target 'RssReader' do
-    pod 'SDWebImage', :head
+    pod 'SDWebImage'
     pod 'AFNetworking'
     pod 'REMenu'
     pod 'SWRevealViewController'
     pod 'UIActivityIndicator-for-SDWebImage'
     pod 'MRProgress'
     pod 'MWFeedParser'
+    pod 'Firebase/Core'
+    pod 'Firebase/AdMob'
 end
 
 target 'RssReaderTests' do

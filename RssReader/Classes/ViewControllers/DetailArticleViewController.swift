@@ -7,14 +7,25 @@
 //
 
 import UIKit
-import iAd
+import GoogleMobileAds
 
-class DetailArticleViewController: UIViewController, UIWebViewDelegate, UIScrollViewDelegate {
+class DetailArticleViewController: UIViewController, UIWebViewDelegate, UIScrollViewDelegate, GADBannerViewDelegate {
     
     var article: Article?
     var statusBarHidden = false
     @IBOutlet var webView: UIWebView!
     @IBOutlet var loadingIndicator: UIImageView!
+    
+    lazy var adBannerView: GADBannerView? = {
+        let adBannerView = GADBannerView(adSize: kGADAdSizeSmartBannerPortrait)
+        adBannerView.adUnitID = ConfigurationManager.admobAdUnitId()
+        adBannerView.delegate = self
+        adBannerView.rootViewController = self
+        
+        return adBannerView
+    }()
+    
+    private var hasSetWebViewContentInset = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,7 +67,9 @@ class DetailArticleViewController: UIViewController, UIWebViewDelegate, UIScroll
         }
         
         // Enable iAd (depends on the settings)
-        canDisplayBannerAds = ConfigurationManager.isDetailViewAdsEnabled()
+        if ConfigurationManager.isDetailViewAdsEnabled() {
+            adBannerView?.loadRequest(GADRequest())
+        }
         
     }
     
@@ -64,10 +77,12 @@ class DetailArticleViewController: UIViewController, UIWebViewDelegate, UIScroll
         navigationController?.hidesBarsOnSwipe = true
     }
     
+    
     func webViewDidFinishLoad(webView: UIWebView) {
         // When the web view finishes loading, we stop and hide the loading indicator
         loadingIndicator.stopAnimating()
         loadingIndicator.hidden = true
+        
     }
     
     // Action method for activating the share actions
@@ -108,5 +123,42 @@ class DetailArticleViewController: UIViewController, UIWebViewDelegate, UIScroll
     // MARK: - UIScrollViewDelegate Methods
     func scrollViewDidScroll(scrollView: UIScrollView) {
         toggleStatusBar()
+    }
+    
+    // MARK: - Google Admob
+    
+    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+        print("Banner loaded successfully")
+        
+        guard let adBannerView = adBannerView else {
+            return
+        }
+        
+        webView.addSubview(adBannerView)
+        
+        // To prevent the banner ad from blocking the content
+        // The contentInset should be changed once when the ad banner is first loaded.
+        // We don't want to change it again when the ad is reloaded.
+        if !hasSetWebViewContentInset {
+            webView.scrollView.contentInset = UIEdgeInsets(top: webView.scrollView.contentInset.top, left: webView.scrollView.contentInset.left, bottom: webView.scrollView.contentInset.bottom + adBannerView.bounds.height, right: webView.scrollView.contentInset.right)
+            hasSetWebViewContentInset = true
+        }
+        
+        // Auto layout constraints for the ad banner
+        // It is placed at the bottom of the screen (or web view)
+        adBannerView.translatesAutoresizingMaskIntoConstraints = false
+        let bottomSpaceConstraint = NSLayoutConstraint(item: adBannerView, attribute: .Bottom, relatedBy: NSLayoutRelation.Equal, toItem: self.webView, attribute: .Bottom, multiplier: 1.0, constant: 0)
+        bottomSpaceConstraint.active = true
+        let leadingSpaceConstraint = NSLayoutConstraint(item: adBannerView, attribute: .Leading, relatedBy: NSLayoutRelation.Equal, toItem: self.webView, attribute: .Leading, multiplier: 1.0, constant: 0)
+        leadingSpaceConstraint.active = true
+        let trailingSpaceConstraint = NSLayoutConstraint(item: adBannerView, attribute: .Trailing, relatedBy: NSLayoutRelation.Equal, toItem: self.webView, attribute: .Trailing, multiplier: 1.0, constant: 0)
+        trailingSpaceConstraint.active = true
+
+
+    }
+    
+    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+        print("Fail to receive ads")
+        print(error)
     }
 }
