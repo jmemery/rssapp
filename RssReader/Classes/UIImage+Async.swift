@@ -10,9 +10,12 @@ import UIKit
 
 extension UIImage {
     
-    func asyncGetImage(url: NSURL, completionHandler: ((data: NSData?, error: NSError?) -> Void)) {
-        NSURLSession.sharedSession().dataTaskWithURL(url, completionHandler: { (data, response, error) -> Void in
-            completionHandler(data: data, error: error)
+    func asyncGetImage(_ url: URL, completionHandler: @escaping ((_ data: Data?, _ error: NSError?) -> Void)) {
+        URLSession.shared.dataTask(with: url, completionHandler: { (data, response, error) -> Void in
+            
+            if let error = error {
+                completionHandler(data, error as NSError)
+            }
         }).resume()
     }
 }

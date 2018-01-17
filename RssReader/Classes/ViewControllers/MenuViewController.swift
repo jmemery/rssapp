@@ -9,7 +9,7 @@
 import UIKit
 
 protocol MenuViewDelegate {
-    func didSelectMenuItem(feed:[String: String])
+    func didSelectMenuItem(_ feed:[String: String])
 }
 
 class MenuViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, SectionHeaderViewDelegate {
@@ -17,33 +17,35 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
     @IBOutlet weak var headerView:UIView!
     
     let feedsURLs: [[String: String]] = ConfigurationManager.sharedConfigurationManager().feeds
-    private var isMenuItemShown:[Bool]!
+    fileprivate var isMenuItemShown:[Bool]!
     var isSectionExpanded:[Bool] = []
     
-    var delegate:MenuViewDelegate?
+    var delegate: MenuViewDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Set the menu background based on the preferred theme
-        switch ConfigurationManager.defaultTheme().lowercaseString {
+        switch ConfigurationManager.defaultTheme().lowercased() {
         case "dark":
-            tableView.backgroundColor = FlatColor.DarkOrange.color()
-            headerView.backgroundColor = FlatColor.DarkOrange.color()
+            tableView.backgroundColor = FlatColor.darkOrange.color()
+            headerView.backgroundColor = FlatColor.darkOrange.color()
+            view.backgroundColor = FlatColor.darkOrange.color()
         case "light":
-            tableView.backgroundColor = FlatColor.BrightYellow.color()
-            headerView.backgroundColor = FlatColor.BrightYellow.color()
+            tableView.backgroundColor = FlatColor.brightYellow.color()
+            headerView.backgroundColor = FlatColor.brightYellow.color()
+            view.backgroundColor = FlatColor.brightYellow.color()
         default: break
         }
         
-        isMenuItemShown = [Bool](count: self.feedsURLs.count, repeatedValue: false)
-        isSectionExpanded = [Bool](count: feedsURLs.count, repeatedValue: false)
+        isMenuItemShown = [Bool](repeating: false, count: self.feedsURLs.count)
+        isSectionExpanded = [Bool](repeating: false, count: feedsURLs.count)
         
         // Hide status bar
-        UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: UIStatusBarAnimation.Slide)
+        UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.slide)
 
         // Register section header view
-        tableView.registerNib(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
+        tableView.register(UINib(nibName: "SectionHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SectionHeaderView")
     }
     
     override func didReceiveMemoryWarning() {
@@ -53,12 +55,12 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // MARK: - Table view data source
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         // Return the number of sections.
         return feedsURLs.count
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Return the number of rows in the section.
         if isSectionExpanded[section] {
             let category = feedsURLs[section]["name"]!
@@ -72,31 +74,31 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
         return 0
     }
     
-    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         
         return 70.0
     }
     
-    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
-        let headerView = tableView.dequeueReusableHeaderFooterViewWithIdentifier("SectionHeaderView") as! SectionHeaderView
+        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "SectionHeaderView") as! SectionHeaderView
         
-        headerView.titleButton.setTitle(feedsURLs[section]["name"], forState: UIControlState.Normal)
+        headerView.titleButton.setTitle(feedsURLs[section]["name"], for: UIControlState())
         headerView.sectionID = section
         headerView.delegate = self
                 
         return headerView
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("MenuCell", forIndexPath: indexPath) as! CustomLabelTableViewCell
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MenuCell", for: indexPath) as! CustomLabelTableViewCell
         
         // Set the menu background based on the preferred theme
-        switch ConfigurationManager.defaultTheme().lowercaseString {
+        switch ConfigurationManager.defaultTheme().lowercased() {
         case "dark":
-            cell.backgroundColor = FlatColor.PaleOrange.color()
+            cell.backgroundColor = FlatColor.paleOrange.color()
         case "light":
-            cell.backgroundColor = FlatColor.PaleYellow.color()
+            cell.backgroundColor = FlatColor.paleYellow.color()
         default: break
         }
 
@@ -109,18 +111,18 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
         return cell
     }
     
-    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         
         cell.alpha = 0.0
-        cell.transform = CGAffineTransformMakeTranslation(0, 100)
-        UIView.animateWithDuration(0.2, delay: 0.02 * Double(indexPath.row), options: [], animations: {
-            cell.transform = CGAffineTransformIdentity
+        cell.transform = CGAffineTransform(translationX: 0, y: 100)
+        UIView.animate(withDuration: 0.2, delay: 0.02 * Double(indexPath.row), options: [], animations: {
+            cell.transform = CGAffineTransform.identity
             cell.alpha = 1.0
             }, completion: nil)
         isMenuItemShown[indexPath.row] = true
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let category = feedsURLs[indexPath.section]["name"] {
             let categoryFeeds = ConfigurationManager.getCategoryFeeds(category)
             let feed = categoryFeeds![indexPath.row]
@@ -130,21 +132,21 @@ class MenuViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     // MARK: - Common methods
     
-    func didSelectMenuItem(feed:[String: String]) {
+    func didSelectMenuItem(_ feed:[String: String]) {
         delegate?.didSelectMenuItem(feed)
-        UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: UIStatusBarAnimation.Slide)
-        performSegueWithIdentifier("unwindToMainScreen", sender: self)
+        UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.slide)
+        performSegue(withIdentifier: "unwindToMainScreen", sender: self)
     }
 
     // MARK: - SectionHeaderDelegate Methods
     
-    func didSelectSectionHeaderView(sectionHeaderView: SectionHeaderView) {
+    func didSelectSectionHeaderView(_ sectionHeaderView: SectionHeaderView) {
         
         if feedsURLs[sectionHeaderView.sectionID]["url"] == "CategoryFeed" {
             
             // Update the status of the category (expanded / collapsed) and reload the section
             isSectionExpanded[sectionHeaderView.sectionID] = isSectionExpanded[sectionHeaderView.sectionID] ? false : true
-            tableView.reloadSections(NSIndexSet(index: sectionHeaderView.sectionID), withRowAnimation: UITableViewRowAnimation.None)
+            tableView.reloadSections(IndexSet(integer: sectionHeaderView.sectionID), with: UITableViewRowAnimation.none)
             
             return
         }

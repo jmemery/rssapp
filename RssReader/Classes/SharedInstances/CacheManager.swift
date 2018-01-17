@@ -11,7 +11,7 @@
 import Foundation
 
 class CacheManager: NSObject {
-    private(set) var cache = NSCache()
+    fileprivate(set) var cache = NSCache<AnyObject, AnyObject>()
     
     override init() {
         super.init()
@@ -19,7 +19,7 @@ class CacheManager: NSObject {
         configure()
     }
     
-    private func configure() {
+    fileprivate func configure() {
         // Configure the cache
         cache.countLimit = 500
     }

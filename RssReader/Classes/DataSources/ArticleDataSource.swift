@@ -8,7 +8,8 @@
 
 import UIKit
 
-typealias ConfigureArticleCellClosure = (articleCell: ArticleViewCell, article: Article, indexPath: NSIndexPath) -> ()
+//typealias ConfigureArticleCellClosure = (_ articleCell: ArticleViewCell, _ article: Article, _ indexPath: IndexPath) -> ()
+typealias ConfigureArticleCellClosure = (ArticleViewCell, Article, IndexPath) -> ()
 
 class ArticleDataSource: NSObject, UITableViewDataSource {
 
@@ -21,23 +22,23 @@ class ArticleDataSource: NSObject, UITableViewDataSource {
         self.configureCellClosure = configureCellClosure
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return articles.count
     }
     
-    private let cellReuseIdentifier = "ArticleViewCell"
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    fileprivate let cellReuseIdentifier = "ArticleViewCell"
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        var cell = tableView.dequeueReusableCellWithIdentifier(cellReuseIdentifier)
+        var cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)
         
         if cell == nil {
-            cell = ArticleViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: cellReuseIdentifier)
+            cell = ArticleViewCell(style: UITableViewCellStyle.default, reuseIdentifier: cellReuseIdentifier)
         }
         
-        let articleCell = cell as? ArticleViewCell;
+        let articleCell = cell as? ArticleViewCell
         let article = articles[indexPath.row]
         
-        self.configureCellClosure(articleCell: articleCell!, article: article, indexPath: indexPath)
+        self.configureCellClosure(articleCell!, article, indexPath)
         
         return cell!;
     }

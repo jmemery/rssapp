@@ -16,7 +16,7 @@ class ConfigurationManager: NSObject {
     override init() {
         super.init()
         
-        if let confPath = NSBundle.mainBundle().pathForResource("ReaderConf", ofType: "plist") {
+        if let confPath = Bundle.main.path(forResource: "ReaderConf", ofType: "plist") {
             configuration = NSDictionary(contentsOfFile: confPath)
         }
     }
@@ -26,15 +26,15 @@ class ConfigurationManager: NSObject {
     }
     
     class func initFeeds() -> [[String: String]] {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("Feeds") as! [[String: String]]
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "Feeds") as! [[String: String]]
         
     }
     
-    class func getCategoryFeeds(category: String) -> [[String: String]]? {
+    class func getCategoryFeeds(_ category: String) -> [[String: String]]? {
         
         var categoryFeeds:[[String: String]]?
         
-        if let categories = ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("CategoryFeeds") as? [String: AnyObject]{
+        if let categories = ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "CategoryFeeds") as? [String: AnyObject]{
 
             categoryFeeds = categories[category] as? [[String: String]]
         }
@@ -43,23 +43,23 @@ class ConfigurationManager: NSObject {
     }
     
     class func isDetailViewAdsEnabled() -> Bool {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("DetailViewAdsEnabled") as! Bool
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "DetailViewAdsEnabled") as! Bool
     }
 
     class func isHomeScreenAdsEnabled() -> Bool {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("HomeScreenAdsEnabled") as! Bool
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "HomeScreenAdsEnabled") as! Bool
     }
 
     class func isDropdownMenuEnabled() -> Bool {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("DropdownMenu") as! Bool
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "DropdownMenu") as! Bool
     }
     
     class func displayMode() -> String {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("DisplayMode") as! String
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "DisplayMode") as! String
     }
     
     class func defaultCellFont() -> String {
-        if let defaultFont = ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("DefaultCellFont") as? String{
+        if let defaultFont = ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "DefaultCellFont") as? String{
 
             return defaultFont
         }
@@ -69,7 +69,7 @@ class ConfigurationManager: NSObject {
 
     class func defaultBarFont() -> String {
         
-        if let defaultFont = ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("DefaultBarFont") as? String {
+        if let defaultFont = ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "DefaultBarFont") as? String {
             return defaultFont
         }
         
@@ -78,7 +78,7 @@ class ConfigurationManager: NSObject {
 
     class func defaultTheme() -> String {
         
-        if let defaultTheme = ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("Theme") as? String {
+        if let defaultTheme = ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "Theme") as? String {
             return defaultTheme
         }
         
@@ -86,11 +86,11 @@ class ConfigurationManager: NSObject {
     }
     
     class func admobAppId() -> String {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("AdmobAppId") as! String
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "AdmobAppId") as! String
     }
     
     class func admobAdUnitId() -> String {
-        return ConfigurationManager.sharedConfigurationManager().configuration?.objectForKey("AdmobAdUnitId") as! String
+        return ConfigurationManager.sharedConfigurationManager().configuration?.object(forKey: "AdmobAdUnitId") as! String
     }
 
 }

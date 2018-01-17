@@ -9,24 +9,24 @@
 import UIKit
 
 class SafariActivity: UIActivity {
-    private var url:NSURL?
+    fileprivate var url:URL?
    
-    override func activityType() -> String? {
-        return "SafariActivity"
-    }
+//    override var activityType: UIActivityType? {
+//        return "SafariActivity"
+//    }
     
-    override func activityTitle() -> String? {
+    override var activityTitle : String? {
         return "Open in Safari"
     }
     
-    override func activityImage() -> UIImage? {
+    override var activityImage : UIImage? {
         let safariImage = UIImage(named: "safari-7")
         return safariImage
     }
     
-    override func canPerformWithActivityItems(activityItems: [AnyObject]) -> Bool {
+    override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
         for activityItem in activityItems {
-            if let activityItem = activityItem as? NSURL where UIApplication.sharedApplication().canOpenURL(activityItem) {
+            if let activityItem = activityItem as? URL, UIApplication.shared.canOpenURL(activityItem) {
                 return true
             }
         }
@@ -34,16 +34,16 @@ class SafariActivity: UIActivity {
         return false
     }
     
-    override func prepareWithActivityItems(activityItems: [AnyObject]) {
+    override func prepare(withActivityItems activityItems: [Any]) {
         for activityItem in activityItems {
-            if let activityItem = activityItem as? NSURL {
+            if let activityItem = activityItem as? URL {
                 url = activityItem
             }
         }
     }
     
-    override func performActivity() {
-        let completed = UIApplication.sharedApplication().openURL(url!)
+    override func perform() {
+        let completed = UIApplication.shared.openURL(url!)
         activityDidFinish(completed)
     }
 }

@@ -11,25 +11,26 @@ import GoogleMobileAds
 
 class ArticleListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate, MenuViewDelegate, GADBannerViewDelegate {
 
-    @IBOutlet weak var headerView:ArticleListHeaderView!
-    @IBOutlet weak var tableView:UITableView!
-    @IBOutlet weak var navHeaderView:ArticleListNavHeaderView!
+    @IBOutlet weak var headerView: ArticleListHeaderView!
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var navHeaderView: ArticleListNavHeaderView!
     @IBOutlet weak var loadingIndicator: UIImageView!
     @IBOutlet weak var blurringImageView:UIImageView!
+    @IBOutlet weak var navHeaderViewHeightConstraint: NSLayoutConstraint!
     
-    private var blurEffectView:UIVisualEffectView?
-    private var defaultTableHeaderHeight:CGFloat = 250.0
-    private var defaultNavHeaderOffset:CGFloat = 37.0
-    private var defaultRowHeight:CGFloat = 138.0
+    fileprivate var blurEffectView: UIVisualEffectView?
+    fileprivate var defaultTableHeaderHeight: CGFloat = 250.0
+    fileprivate var defaultNavHeaderOffset: CGFloat = 37.0
+    fileprivate var defaultRowHeight: CGFloat = 138.0
     
-    private var transitionAnimator = PopTransitionAnimator()
+    fileprivate var transitionAnimator = PopTransitionAnimator()
     
-    private var _currentFeeds: (title: String, url: String)?
-    private let slideUpTransitionAnimator = SlideUpTransitionAnimator()
+    fileprivate var _currentFeeds: (title: String, url: String)?
+    fileprivate let slideUpTransitionAnimator = SlideUpTransitionAnimator()
     
-    private var isRefreshingContent = false
+    fileprivate var isRefreshingContent = false
     
-    private var articles:[Article] = []
+    fileprivate var articles: [Article] = []
     
     // Ad Banner
     lazy var adBannerView: GADBannerView? = {
@@ -41,7 +42,7 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         return adBannerView
     }()
     
-    private var isDragged = false
+    fileprivate var isDragged = false
     
     var currentFeeds: (title: String, url: String)? {
         set (newValue){
@@ -72,15 +73,15 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         
         loadingIndicator.alpha = 0.9
         loadingIndicator.animationDuration = 1.0
-        loadingIndicator.tintColor = UIColor.grayColor()
+        loadingIndicator.tintColor = UIColor.gray
         
         // Initialize blurring image view
         // This image view is used to display a blurring effect while loading the RSS feed
         blurringImageView.image = UIImage(named: "nav_bg")
-        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.ExtraLight)
+        let blurEffect = UIBlurEffect(style: UIBlurEffectStyle.extraLight)
         blurEffectView = UIVisualEffectView(effect: blurEffect)
         blurEffectView?.frame = view.bounds
-        blurringImageView.hidden = false
+        blurringImageView.isHidden = false
         blurringImageView.alpha = 0.9
         blurringImageView.addSubview(blurEffectView!)
         
@@ -93,18 +94,15 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         headerView.titleLabel.text = ""
         headerView.authorLabel.text = ""
         headerView.columnLabel.text = ""
+        
+        // Gesture to handle stretchy header
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ArticleListViewController.showDetailScreen))
         headerView.titleLabel.addGestureRecognizer(tapGestureRecognizer)
-        headerView.titleLabel.userInteractionEnabled = true
-        
-        // Dim the header image view
-        headerView.backgroundColor = UIColor.blackColor()
-        headerView.imageView.layer.opacity = 0.75
-
+        headerView.titleLabel.isUserInteractionEnabled = true
         
         tableView.tableHeaderView = nil
         tableView.addSubview(headerView)
-        tableView.sendSubviewToBack(headerView)
+        tableView.sendSubview(toBack: headerView)
         
         tableView.contentInset = UIEdgeInsets(top: defaultTableHeaderHeight, left: 0, bottom: 0, right: 0)
         tableView.contentOffset = CGPoint(x: 0, y: -defaultTableHeaderHeight)
@@ -117,9 +115,16 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
 
         // Enable Ad (depending on the settings)
         if ConfigurationManager.isHomeScreenAdsEnabled() {
-            adBannerView?.loadRequest(GADRequest())
+            adBannerView?.load(GADRequest())
         }
-        
+      
+    }
+    
+    override func viewWillLayoutSubviews() {
+        // Update the height of the navigation header view for iPhone X
+        if UIScreen.main.nativeBounds.height == 2436 && UIDevice.current.orientation.isPortrait {
+            navHeaderViewHeightConstraint.constant = 88.0            
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -129,12 +134,12 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
     
     // MARK: - Table view data source
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         // Return the number of sections.
         return 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Return the number of rows in the section.
         return (articles.count > 0) ? articles.count : 0
     }
@@ -174,20 +179,20 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
     }
     */
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let article = articles[indexPath.row]
         
         if (indexPath.row + 1) % 4 != 0 {
-            let thumbnailCell = tableView.dequeueReusableCellWithIdentifier("ThumbnailCell", forIndexPath: indexPath) as! ArticleListThumbnailCell
+            let thumbnailCell = tableView.dequeueReusableCell(withIdentifier: "ThumbnailCell", for: indexPath) as! ArticleListThumbnailCell
             
             if indexPath.row == 0 {
-                thumbnailCell.hidden = true
+                thumbnailCell.isHidden = true
             }
             
             thumbnailCell.titleLabel.text = article.title
             if let authorName = article.authorName {
-                thumbnailCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercaseString
+                thumbnailCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercased()
             }
             
             if let articleImageURL = article.headerImageURL {
@@ -196,17 +201,17 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
                 
                 if articleImageURL != "" {
                     // Download the article image
-                    thumbnailCell.thumbnailImageView.sd_setImageWithURL(NSURL(string: articleImageURL), completed: { (image, error, SDImageCacheType, url) -> Void in
+                    thumbnailCell.thumbnailImageView.sd_setImage(with: URL(string: articleImageURL), completed: { (image, error, SDImageCacheType, url) -> Void in
                         if image != nil {
                             // Load the image with a cross dissolve effect
-                            UIView.transitionWithView(thumbnailCell.thumbnailImageView, duration: 0.3, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
+                            UIView.transition(with: thumbnailCell.thumbnailImageView, duration: 0.3, options: UIViewAnimationOptions.transitionCrossDissolve, animations: {
                                 
                                 thumbnailCell.thumbnailImageView.image = image
                                 }, completion: nil)
                             
                         } else {
                             // Minimize the thumbnail image view if there is no image
-                            print("Failed to load \(articleImageURL): \(error.localizedDescription)")
+                            print("Failed to load \(articleImageURL): \(error?.localizedDescription ?? "")")
                             if thumbnailCell.thumbnailImageViewConstraintHeight != nil {
                                 thumbnailCell.thumbnailImageViewConstraintHeight.constant = 0.0
                             }
@@ -235,26 +240,26 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
             return thumbnailCell
             
         } else {
-            let descriptionCell = tableView.dequeueReusableCellWithIdentifier("DescriptionCell", forIndexPath: indexPath) as! ArticleListDescriptionCell
+            let descriptionCell = tableView.dequeueReusableCell(withIdentifier: "DescriptionCell", for: indexPath) as! ArticleListDescriptionCell
             descriptionCell.titleLabel.text = article.title
 
             if let authorName = article.authorName {
-                descriptionCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercaseString
+                descriptionCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercased()
             }
             
-            descriptionCell.descriptionLabel.text = article.description?.stringByReplacingOccurrencesOfString("\n", withString: "").stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+            descriptionCell.descriptionLabel.text = article.description?.replacingOccurrences(of: "\n", with: "").trimmingCharacters(in: CharacterSet.whitespaces)
             
             return descriptionCell
         }
     }
 
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         showDetailScreen()
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row == 0 {
             return 0
         } else {
@@ -263,41 +268,41 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     // MARK: - Table reload handlers
-    func loadTableView(url: String!, title: String?) {
+    func loadTableView(_ url: String!, title: String?) {
         
         tableView.contentInset = UIEdgeInsets(top: defaultTableHeaderHeight, left: 0, bottom: 0, right: 0)
         isDragged = false
 
-        blurringImageView.hidden = false
+        blurringImageView.isHidden = false
         blurringImageView.alpha = 0.9
         
-        loadingIndicator.hidden = false
-        tableView.userInteractionEnabled = false
+        loadingIndicator.isHidden = false
+        tableView.isUserInteractionEnabled = false
         loadingIndicator.startAnimating()
         
         self.service?.getFeedsWithURL(url, completion: { [unowned self] (articles) -> () in
             
             // Table rows to delete
             let countOfCurrentArticles = self.articles.count
-            var indexPathsToDelete = [NSIndexPath]()
+            var indexPathsToDelete = [IndexPath]()
             if countOfCurrentArticles != 0 {
                 for index in 0..<countOfCurrentArticles {
-                    indexPathsToDelete.append(NSIndexPath(forRow: index, inSection: 0))
+                    indexPathsToDelete.append(IndexPath(row: index, section: 0))
                 }
             }
             
             // Table rows to insert
-            var indexPathsToInsert = [NSIndexPath]()
+            var indexPathsToInsert = [IndexPath]()
             for row in 0..<articles.count {
-                indexPathsToInsert.append(NSIndexPath(forRow: row, inSection: 0))
+                indexPathsToInsert.append(IndexPath(row: row, section: 0))
             }
             
             // Update the table view to display the articles
             if indexPathsToInsert.count > 0 {
                 self.articles = articles
                 self.tableView.beginUpdates()
-                self.tableView.deleteRowsAtIndexPaths(indexPathsToDelete, withRowAnimation: .None)
-                self.tableView.insertRowsAtIndexPaths(indexPathsToInsert, withRowAnimation: .None)
+                self.tableView.deleteRows(at: indexPathsToDelete, with: .none)
+                self.tableView.insertRows(at: indexPathsToInsert, with: .none)
                 self.tableView.endUpdates()
             }
             
@@ -305,41 +310,41 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
             self.updateHeaderView()
             
             // Scroll to the top of the table view
-            self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: UITableViewScrollPosition.Top, animated: true)
+            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: UITableViewScrollPosition.top, animated: true)
             
-            UIView.transitionWithView(self.blurringImageView, duration: 0.35, options: UIViewAnimationOptions.TransitionCrossDissolve, animations: {
+            UIView.transition(with: self.blurringImageView, duration: 0.35, options: UIViewAnimationOptions.transitionCrossDissolve, animations: {
                 
-            self.blurringImageView.alpha = 0.0
-            self.blurringImageView.hidden = true
+                self.blurringImageView.alpha = 0.0
+                self.blurringImageView.isHidden = true
             }, completion: nil)
 
             self.loadingIndicator.stopAnimating()
-            self.loadingIndicator.hidden = true
-            self.tableView.userInteractionEnabled = true
+            self.loadingIndicator.isHidden = true
+            self.tableView.isUserInteractionEnabled = true
             self.isRefreshingContent = false
             
             if let menuTitle = title {
                 self.navHeaderView.titleLabel.text = menuTitle
             }
         
-        }) { (error: NSError) -> (Void) in
+        }) { (error: Error) -> (Void) in
             print("Error: \(error.localizedDescription)", terminator: "")
             
             // Display alert
-            let alertController = UIAlertController(title: "Download Error", message: "Failed to retrieve articles from \(title!). Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
-            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+            let alertController = UIAlertController(title: "Download Error", message: "Failed to retrieve articles from \(title!). Please try again later.", preferredStyle: UIAlertControllerStyle.alert)
+            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil)
             alertController.addAction(okAction)
-            self.presentViewController(alertController, animated: true, completion: nil)
+            self.present(alertController, animated: true, completion: nil)
             
             // Hide the loading indicator
             self.loadingIndicator.stopAnimating()
-            self.loadingIndicator.hidden = true
-            self.tableView.userInteractionEnabled = true
+            self.loadingIndicator.isHidden = true
+            self.tableView.isUserInteractionEnabled = true
             self.isRefreshingContent = false
             
             // Hide blurring view
             self.blurringImageView.alpha = 0.0
-            self.blurringImageView.hidden = true
+            self.blurringImageView.isHidden = true
 
         }
     }
@@ -359,7 +364,7 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
             if let articleImageURL = article.headerImageURL {
                 if articleImageURL != "" {
                     // Download the article image
-                    headerView.imageView.sd_setImageWithURL(NSURL(string: articleImageURL), completed: { (image, error, SDImageCacheType, url) -> Void in
+                    headerView.imageView.sd_setImage(with: URL(string: articleImageURL), completed: { (image, error, SDImageCacheType, url) -> Void in
                         if image != nil {
                             self.headerView.imageView.image = image
                         }
@@ -373,16 +378,16 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
 
             headerView.titleLabel.text = article.title
             if let authorName = article.authorName {
-                headerView.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercaseString
+                headerView.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercased()
             }
-            headerView.columnLabel.text = (article.categories.count > 0) ? article.categories[0].uppercaseString : ""
+            headerView.columnLabel.text = (article.categories.count > 0) ? article.categories[0].uppercased() : ""
         }
 
     }
     
     // MARK: - UIScrollViewDelegate
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         // Stretchy header
         var headerViewFrame = CGRect(x: 0, y: -defaultTableHeaderHeight, width: tableView.bounds.size.width, height: defaultTableHeaderHeight)
@@ -399,9 +404,9 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         let offsetY = scrollView.contentOffset.y + defaultTableHeaderHeight
         
         if offsetY < defaultNavHeaderOffset {
-            navHeaderView.backgroundColor = UIColor.clearColor()
+            navHeaderView.backgroundColor = UIColor.clear
         } else if offsetY > defaultTableHeaderHeight {
-            navHeaderView.backgroundColor = UIColor.blackColor()
+            navHeaderView.backgroundColor = UIColor.black
         } else {
             navHeaderView.backgroundColor = UIColor(white: 0.0, alpha: (offsetY - defaultNavHeaderOffset) / (defaultTableHeaderHeight - defaultNavHeaderOffset))
         }
@@ -424,18 +429,18 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         // Pull to refresh
         if !isRefreshingContent {
             if -offsetY > 60 {
-                blurringImageView.hidden = false
+                blurringImageView.isHidden = false
                 blurringImageView.alpha = (-offsetY - 60) / 40
                 
             } else {
-                blurringImageView.hidden = true
+                blurringImageView.isHidden = true
                 blurringImageView.alpha = 0.0
 
             }
         }
     }
     
-    func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let offsetY = scrollView.contentOffset.y + defaultTableHeaderHeight
         if -offsetY > 100 {
             isRefreshingContent = true
@@ -443,21 +448,21 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         // Indicate the user has interacted with the table view
         isDragged = true
     }
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         
         // Update the size of the header image
-        coordinator.animateAlongsideTransition({ (context) -> Void in
+        coordinator.animate(alongsideTransition: { (context) -> Void in
             self.updateHeaderView()
             }, completion: {(context) -> Void in
         })
     }
     
-    override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         // Update the bounds of the blur effect view when the orientation change
         blurEffectView?.frame = view.bounds
     }
@@ -465,12 +470,12 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
     // MARK: - Navigation
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showMenu" {
-            let menuViewController = segue.destinationViewController as! MenuViewController
+            let menuViewController = segue.destination as! MenuViewController
             menuViewController.delegate = self
         } else if segue.identifier == "showDetail" {
-            let destinationViewController = segue.destinationViewController as! ArticleExcerptViewController
+            let destinationViewController = segue.destination as! ArticleExcerptViewController
             destinationViewController.transitioningDelegate = transitionAnimator
             if let indexPath = tableView.indexPathForSelectedRow {
                 destinationViewController.article = articles[indexPath.row]
@@ -480,50 +485,51 @@ class ArticleListViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
     
-    func showDetailScreen() {
-        self.performSegueWithIdentifier("showDetail", sender: self)
+    @objc func showDetailScreen() {
+        self.performSegue(withIdentifier: "showDetail", sender: self)
     }
     
-    @IBAction func unwindToMainScreen(segue: UIStoryboardSegue) {
-        if UIApplication.sharedApplication().statusBarHidden {
-            UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: UIStatusBarAnimation.Slide)
+    @IBAction func unwindToMainScreen(_ segue: UIStoryboardSegue) {
+        if UIApplication.shared.isStatusBarHidden {
+            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.slide)
         }
     }
     
+    
     // MARK: - Status bar
     
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return .LightContent
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return .lightContent
     }
 
     // MARK: - MenuViewDelegate
     
-    func didSelectMenuItem(feed:[String: String]) {
+    func didSelectMenuItem(_ feed:[String: String]) {
         currentFeeds = (title: feed["name"]!, url: feed["url"]!)
     }
 
 
     // MARK: - Google Admob
     
-    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
         print("Banner loaded successfully")
         
         // Reset the content offset
-        tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
+        tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
         
         // Reposition the banner ad to create a slide down effect
-        let translateTransform = CGAffineTransformMakeTranslation(0, -bannerView.bounds.size.height)
+        let translateTransform = CGAffineTransform(translationX: 0, y: -bannerView.bounds.size.height)
         bannerView.transform = translateTransform
         
-        UIView.animateWithDuration(0.5) {
+        UIView.animate(withDuration: 0.5, animations: {
             self.tableView.tableHeaderView?.frame = bannerView.frame
-            bannerView.transform = CGAffineTransformIdentity
+            bannerView.transform = CGAffineTransform.identity
             self.tableView.tableHeaderView = bannerView
-        }
+        }) 
         
     }
     
-    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
         print("Fail to receive ads")
         print(error)
     }

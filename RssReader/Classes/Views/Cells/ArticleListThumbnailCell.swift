@@ -21,7 +21,7 @@ class ArticleListThumbnailCell: UITableViewCell {
         configure()
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
@@ -37,8 +37,8 @@ class ArticleListThumbnailCell: UITableViewCell {
 
     
     func configure() -> Void {
-        titleLabel.lineBreakMode = .ByWordWrapping
-        authorLabel.lineBreakMode = .ByWordWrapping
+        titleLabel.lineBreakMode = .byWordWrapping
+        authorLabel.lineBreakMode = .byWordWrapping
 
         if ConfigurationManager.defaultCellFont() != "default" {
             titleLabel.font = UIFont(name: ConfigurationManager.defaultCellFont(), size: 18.0)

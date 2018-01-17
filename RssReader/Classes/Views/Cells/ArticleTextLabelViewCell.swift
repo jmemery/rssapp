@@ -18,7 +18,7 @@ class ArticleTextLabelViewCell: UITableViewCell {
         configure()
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
@@ -34,6 +34,6 @@ class ArticleTextLabelViewCell: UITableViewCell {
     
     func configure() -> Void {
         // Set the default link color
-        descriptionTextView.linkTextAttributes = [NSForegroundColorAttributeName: UIColor(red: 255.0/255.0, green: 59.0/255.0, blue: 48.0/255.0, alpha: 1.0)]
+        descriptionTextView.linkTextAttributes = [NSAttributedStringKey.foregroundColor.rawValue: UIColor(red: 255.0/255.0, green: 59.0/255.0, blue: 48.0/255.0, alpha: 1.0)]
     }
 }

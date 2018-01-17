@@ -18,14 +18,14 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     var article: Article?
     
     // Header view configuration
-    private var defaultTableHeaderHeight:CGFloat = 250.0
-    private var lastContentOffset:CGFloat = 0.0
-    private let defaultHeaderImageName = "bg-pattern"
+    fileprivate var defaultTableHeaderHeight:CGFloat = 250.0
+    fileprivate var lastContentOffset:CGFloat = 0.0
+    fileprivate let defaultHeaderImageName = "bg-pattern"
   
     // Transition animator for 
     var transitionAnimator:SlideUpTransitionAnimator = SlideUpTransitionAnimator()
     
-    private var tappedLink:String = ""
+    fileprivate var tappedLink:String = ""
 
     // Ad Banner
     lazy var adBannerView: GADBannerView? = {
@@ -38,12 +38,12 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     }()
 
     
-    private var isDragged = false
+    fileprivate var isDragged = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.separatorStyle = .None
+        tableView.separatorStyle = .none
         tableView.rowHeight = UITableViewAutomaticDimension
         
         // Add the header view to the table view background
@@ -52,7 +52,7 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         
         tableView.tableHeaderView = nil
         tableView.addSubview(headerView)
-        tableView.sendSubviewToBack(headerView)
+        tableView.sendSubview(toBack: headerView)
         
         tableView.contentInset = UIEdgeInsets(top: defaultTableHeaderHeight, left: 0, bottom: 0, right: 0)
         tableView.contentOffset = CGPoint(x: 0, y: -defaultTableHeaderHeight)
@@ -63,7 +63,7 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         if let articleImageURL = article?.headerImageURL {
             if articleImageURL != "" {
                 // Download the article image
-                headerView.imageView.sd_setImageWithURL(NSURL(string: articleImageURL), completed: { (image, error, SDImageCacheType, url) -> Void in
+                headerView.imageView.sd_setImage(with: URL(string: articleImageURL), completed: { (image, error, SDImageCacheType, url) -> Void in
                     if image != nil {
                         self.headerView.imageView.image = image
                     } else {
@@ -81,7 +81,7 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         if ConfigurationManager.isDetailViewAdsEnabled() {
 //            adBannerView = ADBannerView(adType: ADAdType.Banner)
 //            adBannerView?.delegate = self
-            adBannerView?.loadRequest(GADRequest())
+            adBannerView?.load(GADRequest())
         }
     }
     
@@ -95,12 +95,12 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     // MARK: - UIScrollViewDelegate
-    func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         // Indicate the user has interacted with the table view
         isDragged = true
     }
     
-    func scrollViewDidScroll(scrollView: UIScrollView) {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         var headerViewFrame = CGRect(x: 0, y: -defaultTableHeaderHeight, width: tableView.bounds.size.width, height: defaultTableHeaderHeight)
         
@@ -129,11 +129,11 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         
         // Hide the status bar when scrolling up
         if offsetY + defaultTableHeaderHeight > 10 {
-            UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation:
-                .Fade)
+            UIApplication.shared.setStatusBarHidden(true, with:
+                .fade)
         } else {
-            UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation:
-                .Fade)
+            UIApplication.shared.setStatusBarHidden(false, with:
+                .fade)
         }
   /*
         if -offsetY >= defaultTableHeaderHeight || lastContentOffset > offsetY {
@@ -152,9 +152,9 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     
-    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         
-        coordinator.animateAlongsideTransition({ (context) -> Void in
+        coordinator.animate(alongsideTransition: { (context) -> Void in
             self.updateHeaderView()
             }, completion: {(context) -> Void in
         })
@@ -165,30 +165,30 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     
     // MARK: - Table view data source
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         // Return the number of sections.
         return 2
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // Return the number of rows in the section.
         return 1
     }
     
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         if indexPath.section == 0 {
-            let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell", forIndexPath: indexPath) as! ArticleMetaViewCell
+            let headerCell = tableView.dequeueReusableCell(withIdentifier: "HeaderCell", for: indexPath) as! ArticleMetaViewCell
             headerCell.titleLabel.text = article?.title
             if let authorName = article?.authorName {
-                headerCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercaseString
+                headerCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercased()
             }
             
             return headerCell
             
         } else if indexPath.section == 1 {
-            let contentCell = tableView.dequeueReusableCellWithIdentifier("ContentCell", forIndexPath: indexPath) as! ArticleTextLabelViewCell
+            let contentCell = tableView.dequeueReusableCell(withIdentifier: "ContentCell", for: indexPath) as! ArticleTextLabelViewCell
             
             contentCell.descriptionTextView.delegate = self
             contentCell.descriptionTextView.attributedText = NSAttributedString(string: "")
@@ -204,15 +204,15 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
             // the stringByFormattingHTMLString() to generate the attributed string.
             let textDescription = articleDescription?.stringByFormattingHTMLString({ (range, string) -> Void in
 
-                NSOperationQueue.mainQueue().addOperationWithBlock({
+                OperationQueue.main.addOperation({
 
                     // Once the image is downloaded, replace the image with the empty image
                     // generated by default
-                    contentCell.descriptionTextView.textStorage.replaceCharactersInRange(range, withAttributedString: string)
+                    contentCell.descriptionTextView.textStorage.replaceCharacters(in: range, with: string)
                     
                     // Ask the table view cell to update its size
                     let currentSize = contentCell.descriptionTextView.bounds.size
-                    let newSize = contentCell.descriptionTextView.sizeThatFits(CGSize(width: currentSize.width, height: CGFloat.max))
+                    let newSize = contentCell.descriptionTextView.sizeThatFits(CGSize(width: currentSize.width, height: CGFloat.greatestFiniteMagnitude))
                     
                     if newSize.height != currentSize.height {
                         self.tableView.beginUpdates()
@@ -232,7 +232,7 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     }
     
     
-    func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         var cellHeight:CGFloat = 44.0
         
         if indexPath.section == 0 {
@@ -246,11 +246,11 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
         
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    override func prefersStatusBarHidden() -> Bool {
+    override var prefersStatusBarHidden : Bool {
         return true
     }
 
@@ -264,72 +264,72 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
         if segue.identifier == "showArticle" {
             let destinationViewController:DetailArticleViewController
-            destinationViewController = segue.destinationViewController as! DetailArticleViewController
+            destinationViewController = segue.destination as! DetailArticleViewController
             destinationViewController.article = article // selectedArticle
 
-            UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: UIStatusBarAnimation.Slide)
+            UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.slide)
             destinationViewController.transitioningDelegate = transitionAnimator
         
         } else if segue.identifier == "showLink" {
             let destinationViewController:DetailArticleViewController
-            destinationViewController = segue.destinationViewController as! DetailArticleViewController
+            destinationViewController = segue.destination as! DetailArticleViewController
             let articleToDisplay = Article()
             articleToDisplay.link = tappedLink
             destinationViewController.article = articleToDisplay // selectedArticle
             
-            UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: UIStatusBarAnimation.Slide)
+            UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.slide)
             destinationViewController.transitioningDelegate = transitionAnimator
             
         }
 
     }
     
-    @IBAction func unwindToExcerptScreen(segue: UIStoryboardSegue) {
-        if UIApplication.sharedApplication().statusBarHidden {
-            UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: UIStatusBarAnimation.Slide)
+    @IBAction func unwindToExcerptScreen(_ segue: UIStoryboardSegue) {
+        if UIApplication.shared.isStatusBarHidden {
+            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.slide)
         }
     }
     
     // Action method for activating the share actions
-    @IBAction func shareAction(sender: UIBarButtonItem) {
+    @IBAction func shareAction(_ sender: UIBarButtonItem) {
         
         var sharingItems = [AnyObject]()
         if let title = article?.title {
             if let link = article?.link {
-                sharingItems.append(title)
-                sharingItems.append(NSURL(string: link)!)
+                sharingItems.append(title as AnyObject)
+                sharingItems.append(URL(string: link)! as AnyObject)
             } else {
-                sharingItems.append(title)
+                sharingItems.append(title as AnyObject)
             }
         }
         
         let activityViewController = UIActivityViewController(activityItems: sharingItems, applicationActivities: [SafariActivity()])
         
-        if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Pad {
+        if UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad {
             activityViewController.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
         }
         
-        self.presentViewController(activityViewController, animated: true, completion: nil)
+        self.present(activityViewController, animated: true, completion: nil)
     }
 
     // MARK: - UITextViewDelegate
-    func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
         
-        tappedLink = URL.absoluteString!
-        performSegueWithIdentifier("showLink", sender: self)
+        tappedLink = URL.absoluteString
+        performSegue(withIdentifier: "showLink", sender: self)
 
         return false
     }
     
     
-    func textViewDidChange(textView: UITextView) {
+    func textViewDidChange(_ textView: UITextView) {
         let currentSize = textView.bounds.size
-        let newSize = textView.sizeThatFits(CGSize(width: currentSize.width, height: CGFloat.max))
+        let newSize = textView.sizeThatFits(CGSize(width: currentSize.width, height: CGFloat.greatestFiniteMagnitude))
         
         if newSize.height != currentSize.height {
             tableView.beginUpdates()
@@ -340,25 +340,25 @@ class ArticleExcerptViewController: UIViewController, UITableViewDataSource, UIT
     
     // MARK: - Google Admob
     
-    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
         print("Banner loaded successfully")
         
         // Reset the content offset
-        tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
+        tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
         
         // Reposition the banner ad to create a slide down effect
-        let translateTransform = CGAffineTransformMakeTranslation(bannerView.bounds.size.width, 0)
+        let translateTransform = CGAffineTransform(translationX: bannerView.bounds.size.width, y: 0)
         bannerView.transform = translateTransform
         
-        UIView.animateWithDuration(0.3) {
+        UIView.animate(withDuration: 0.3, animations: {
             self.tableView.tableHeaderView?.frame = bannerView.frame
-            bannerView.transform = CGAffineTransformIdentity
+            bannerView.transform = CGAffineTransform.identity
             self.tableView.tableHeaderView = bannerView
-        }
+        }) 
         
     }
     
-    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
         print("Fail to receive ads")
         print(error)
     }

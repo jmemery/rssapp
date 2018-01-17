@@ -13,30 +13,28 @@ class Article {
     var categories = [String]()
     var headerImageURL: String? = "" {
         didSet {
-            headerImageURL = headerImageURL?.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
-//            headerImageURL = headerImageURL?.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)
-            headerImageURL = headerImageURL?.stringByRemovingPercentEncoding!
-//            headerImageURL = headerImageURL?.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
-            headerImageURL = headerImageURL?.stringByReplacingOccurrencesOfString("&amp;", withString: "&")
+            headerImageURL = headerImageURL?.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)
+            headerImageURL = headerImageURL?.removingPercentEncoding!
+            headerImageURL = headerImageURL?.replacingOccurrences(of: "&amp;", with: "&")
         }
     }
     var commentsCount = 0
     var authorName: String? = ""
     var title: String? = "" {
         didSet {
-            title = title?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+            title = title?.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
         }
     }
     var isFavorite = false
-    var publicationDate = NSDate()
+    var publicationDate = Date()
     var description: String? = ""
     var rawDescription: String? = "" /*{
         didSet {
             description = rawDescription?.stringByDecodingHTMLEscapeCharacters()
         }
     }*/
-    var readAt: NSDate?
-    var favoritedAt: NSDate?
+    var readAt: Date?
+    var favoritedAt: Date?
     var content: String? = ""
     var guid: String? = ""
     

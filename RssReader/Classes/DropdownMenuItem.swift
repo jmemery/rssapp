@@ -9,9 +9,9 @@
 import Foundation
 
 class DropdownMenuItem: REMenuItem {
-    var url: NSURL?
+    var url: URL?
     
-    override init!(title: String!, image: UIImage!, highlightedImage: UIImage!, action: ((REMenuItem!) -> Void)!) {
+    override init!(title: String!, image: UIImage!, highlightedImage: UIImage!, action: ((REMenuItem?) -> Void)!) {
         super.init(title: title, image: image, highlightedImage: highlightedImage, action: action)
     }
 }

@@ -19,7 +19,7 @@ class ArticleListDescriptionCell: UITableViewCell {
         configure()
     }
 
-    override func setSelected(selected: Bool, animated: Bool) {
+    override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
@@ -33,8 +33,8 @@ class ArticleListDescriptionCell: UITableViewCell {
     }
     
     func configure() -> Void {
-        titleLabel.lineBreakMode = .ByWordWrapping
-        descriptionLabel.lineBreakMode = .ByWordWrapping
+        titleLabel.lineBreakMode = .byWordWrapping
+        descriptionLabel.lineBreakMode = .byWordWrapping
         
         if ConfigurationManager.defaultCellFont() != "default" {
             titleLabel.font = UIFont(name: ConfigurationManager.defaultCellFont(), size: 29.0)

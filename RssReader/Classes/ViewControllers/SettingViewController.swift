@@ -31,12 +31,12 @@ class SettingViewController: UITableViewController, MFMailComposeViewControllerD
             // composer.setToRecipients(["<your email>"])
             //composer.navigationBar.tintColor = UIColor.whiteColor()
             
-            presentViewController(composer, animated: true, completion: {
+            present(composer, animated: true, completion: {
                 switch ConfigurationManager.defaultTheme() {
                     case "dark":
-                        UIApplication.sharedApplication().setStatusBarStyle(.LightContent, animated: false)
+                        UIApplication.shared.setStatusBarStyle(.lightContent, animated: false)
                     case "light":
-                        UIApplication.sharedApplication().setStatusBarStyle(.Default, animated: false)
+                        UIApplication.shared.setStatusBarStyle(.default, animated: false)
                     default:
                         break
                 }
@@ -45,39 +45,39 @@ class SettingViewController: UITableViewController, MFMailComposeViewControllerD
         }
     }
     
-    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
         
         switch result {
-        case MFMailComposeResult.Cancelled:
+        case MFMailComposeResult.cancelled:
             print("Mail cancelled")
             
-        case MFMailComposeResult.Saved:
+        case MFMailComposeResult.saved:
             print("Mail saved")
             
-        case MFMailComposeResult.Sent:
+        case MFMailComposeResult.sent:
             print("Mail sent")
             
-        case MFMailComposeResult.Failed:
+        case MFMailComposeResult.failed:
             print("Failed to send mail: \(error!.localizedDescription)")
         }
         
         // Dismiss the Mail interface
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 75.0
     }
     
     @IBAction func dismissController() {
         // Dismiss the current interface
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
 
     }
     
     // MARK: - Table view data source
 
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if (indexPath.row == 0) {
             sendUsFeedback()
         }

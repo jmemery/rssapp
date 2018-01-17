@@ -12,22 +12,22 @@ class SlideUpTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning
     var isPresenting = false
     var duration = 0.5
     
-    func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
+    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return duration
     }
     
-    func animateTransition(transitionContext: UIViewControllerContextTransitioning) {
+    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
         // Get reference to our fromView, toView and the container view
-        let fromView = transitionContext.viewForKey(UITransitionContextFromViewKey)!
-        let toView = transitionContext.viewForKey(UITransitionContextToViewKey)!
+        let fromView = transitionContext.view(forKey: UITransitionContextViewKey.from)!
+        let toView = transitionContext.view(forKey: UITransitionContextViewKey.to)!
         
         // Set up the transform we'll use in the animation
-        let container = transitionContext.containerView()
-        let offScreenDown = CGAffineTransformMakeTranslation(0, container.frame.height)
+        let container = transitionContext.containerView
+        let offScreenDown = CGAffineTransform(translationX: 0, y: container.frame.height)
         
-        let shiftDown = CGAffineTransformMakeTranslation(0, 15)
-        let scaleDown = CGAffineTransformScale(shiftDown, 0.95, 0.95)
+        let shiftDown = CGAffineTransform(translationX: 0, y: 15)
+        let scaleDown = shiftDown.scaledBy(x: 0.95, y: 0.95)
         
         // Add both views to the container view
         if isPresenting {
@@ -42,16 +42,16 @@ class SlideUpTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning
         }
         
         // Perform the animation
-        UIView.animateWithDuration(duration, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.8, options: [], animations: {
+        UIView.animate(withDuration: duration, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.8, options: [], animations: {
             
             if self.isPresenting {
                 fromView.transform = scaleDown
                 fromView.alpha = 0.5
-                toView.transform = CGAffineTransformIdentity
+                toView.transform = CGAffineTransform.identity
             } else {
                 fromView.transform = offScreenDown
                 toView.alpha = 1.0
-                toView.transform = CGAffineTransformIdentity
+                toView.transform = CGAffineTransform.identity
             }
             
             }, completion: { finished in
@@ -62,12 +62,12 @@ class SlideUpTransitionAnimator: NSObject, UIViewControllerAnimatedTransitioning
         
     }
     
-    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         isPresenting = false
         return self
     }
     
-    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         isPresenting = true
         return self
     }

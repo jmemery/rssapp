@@ -13,8 +13,8 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
     @IBOutlet var navigationHeaderButton: UIButton!
     var navigationHeaderLabel:UILabel?
     
-    private var _currentFeeds: (title: String, url: String)?
-    private let slideUpTransitionAnimator = SlideUpTransitionAnimator()
+    fileprivate var _currentFeeds: (title: String, url: String)?
+    fileprivate let slideUpTransitionAnimator = SlideUpTransitionAnimator()
     
     var currentFeeds: (title: String, url: String)? {
         set (newValue){
@@ -34,15 +34,15 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
             articleCell.titleLabel.text = article.title
 
             if let authorName = article.authorName {
-                articleCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercaseString
+                articleCell.authorLabel.text = (authorName == "") ? "" : "BY \(authorName)".uppercased()
             }
             
-            articleCell.categoryLabel.text = article.categories.first?.uppercaseString
+            articleCell.categoryLabel.text = article.categories.first?.uppercased()
             
             // Display article date
-            let dateFormatter = NSDateFormatter()
+            let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM dd HH:mm"
-            articleCell.dateTimeLabel.text = dateFormatter.stringFromDate(article.publicationDate)
+            articleCell.dateTimeLabel.text = dateFormatter.string(from: article.publicationDate as Date)
             
             // If the comment count is zero, hide the comment label
             if article.commentsCount != 0 {
@@ -51,8 +51,8 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
                 }
             } else {
                 if articleCell.commentsCountLabel != nil {
-                    articleCell.commentsCountLabel.hidden = true
-                    articleCell.commentsLabel.hidden = true
+                    articleCell.commentsCountLabel.isHidden = true
+                    articleCell.commentsLabel.isHidden = true
                 }
             }
             
@@ -64,13 +64,13 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
             // Load article image
             if let articleImageURL = article.headerImageURL {
                 if articleImageURL != "" {
-                    if self.storyboard!.valueForKey("name")! as! String == "Main_iPhone" {
+                    if self.storyboard!.value(forKey: "name")! as! String == "Main_iPhone" {
                         if articleCell.imageViewConstraintHeight != nil {
                             articleCell.imageViewConstraintHeight.constant = 252.0
                         }
                         self.tableView.estimatedRowHeight = 357.0
                         
-                    } else if self.storyboard!.valueForKey("name")! as! String == "Main_iPhone-2" {
+                    } else if self.storyboard!.value(forKey: "name")! as! String == "Main_iPhone-2" {
                         if ConfigurationManager.displayMode() == "Image" {
                             articleCell.imageViewConstraintHeight.constant = 171.0
                             articleCell.imageViewConstraintWidth.constant = 120.0
@@ -91,7 +91,7 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
                         }
                         self.tableView.estimatedRowHeight = 171.0
                         
-                    } else if self.storyboard!.valueForKey("name")! as! String == "Main_iPad" {
+                    } else if self.storyboard!.value(forKey: "name")! as! String == "Main_iPad" {
                         if articleCell.imageViewConstraintHeight != nil {
                             articleCell.imageViewConstraintHeight.constant = 420.0
                             self.tableView.estimatedRowHeight = 582.0
@@ -99,13 +99,15 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
                     }
 
                     // Download the article image
-                    if self.storyboard!.valueForKey("name")! as! String == "Main_iPhone" ||
-                        (self.storyboard!.valueForKey("name")! as! String == "Main_iPhone-2" && ConfigurationManager.displayMode() != "Text") || self.storyboard!.valueForKey("name")! as! String == "Main_iPad" {
-                        articleCell.headerImageView.sd_setImageWithURL(NSURL(string: articleImageURL)) { (image: UIImage!, error: NSError!, cacheTYpe: SDImageCacheType, url: NSURL!) -> Void in
+                    if self.storyboard!.value(forKey: "name")! as! String == "Main_iPhone" ||
+                        (self.storyboard!.value(forKey: "name")! as! String == "Main_iPhone-2" && ConfigurationManager.displayMode() != "Text") || self.storyboard!.value(forKey: "name")! as! String == "Main_iPad" {
+                
+                        
+                        articleCell.headerImageView.sd_setImage(with: URL(string: articleImageURL)!) { (image, error, cacheType, url) -> Void in
                             
                             // Sometimes, the default image is too small to display.
                             // In this case, we will hide the thumbnail
-                            if image == nil || image.size.width < 10 {
+                            guard let image = image, image.size.width >= 10 else {
                                 if articleCell.imageViewConstraintHeight != nil {
                                     articleCell.imageViewConstraintHeight.constant = 0.0
                                 }
@@ -114,9 +116,23 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
                                     articleCell.imageViewConstraintWidth.constant = 0.0
                                 }
                                 
-                            } else {
-                                articleCell.headerImageView.image = image
+                                return
                             }
+                            
+                            articleCell.headerImageView.image = image
+                            
+//                            if image == nil || image.size.width < 10 {
+//                                if articleCell.imageViewConstraintHeight != nil {
+//                                    articleCell.imageViewConstraintHeight.constant = 0.0
+//                                }
+//                                
+//                                if articleCell.imageViewConstraintWidth != nil {
+//                                    articleCell.imageViewConstraintWidth.constant = 0.0
+//                                }
+//                                
+//                            } else {
+//                                articleCell.headerImageView.image = image
+//                            }
                         }
                     }
                 } else {
@@ -141,13 +157,13 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
     // Dropdown Menu Configuration
     lazy var navigationMenu: REMenu = {
         var dropdownMenu = REMenu()
-        dropdownMenu.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.8)
-        dropdownMenu.separatorColor = UIColor.clearColor()
-        dropdownMenu.highlightedBackgroundColor = UIColor.blackColor()
-        dropdownMenu.highlightedSeparatorColor = UIColor.whiteColor()
-        dropdownMenu.borderColor = UIColor.clearColor()
-        dropdownMenu.textColor = UIColor.whiteColor()
-        dropdownMenu.highlightedTextColor = UIColor.whiteColor()
+        dropdownMenu.backgroundColor = UIColor.black.withAlphaComponent(0.8)
+        dropdownMenu.separatorColor = UIColor.clear
+        dropdownMenu.highlightedBackgroundColor = UIColor.black
+        dropdownMenu.highlightedSeparatorColor = UIColor.white
+        dropdownMenu.borderColor = UIColor.clear
+        dropdownMenu.textColor = UIColor.white
+        dropdownMenu.highlightedTextColor = UIColor.white
         dropdownMenu.font = UIFont(name: ConfigurationManager.defaultBarFont(), size: 17.0)
         dropdownMenu.separatorHeight = 0
 
@@ -175,8 +191,8 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
                 let urlPath = _item.url?.relativePath
                 self.currentFeeds = (title: item.title, url: urlPath!)
             })
-            item.url = NSURL(fileURLWithPath: url!)
-            feedsItems.append(item);
+            item?.url = URL(fileURLWithPath: url!)
+            feedsItems.append(item!);
         }
 
         return feedsItems
@@ -209,20 +225,20 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
             navigationHeaderButton.titleLabel?.font = UIFont(name: ConfigurationManager.defaultBarFont(), size: 17.0)
             switch ConfigurationManager.defaultTheme() {
                 case "dark":
-                    navigationHeaderButton.tintColor = UIColor.whiteColor()
+                    navigationHeaderButton.tintColor = UIColor.white
                 case "light":
                     navigationHeaderButton.tintColor = UIColor(red: 166.0/255.0, green: 37.0/255.0, blue: 15.0/255.0, alpha: 1.0)
                 default: break
             }
             
         } else {
-            navigationHeaderLabel = UILabel(frame: CGRectMake(0, 0, 200, 40))
+            navigationHeaderLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 40))
             navigationHeaderLabel?.text = feedsURLs[0]["name"]!
-            navigationHeaderLabel?.textAlignment = .Center
+            navigationHeaderLabel?.textAlignment = .center
             navigationHeaderLabel?.font = UIFont(name: ConfigurationManager.defaultBarFont(), size: 17.0)
             switch ConfigurationManager.defaultTheme() {
                 case "dark":
-                    navigationHeaderLabel?.textColor = UIColor.whiteColor()
+                    navigationHeaderLabel?.textColor = UIColor.white
                 case "light":
                     navigationHeaderLabel?.textColor = UIColor(red: 166.0/255.0, green: 37.0/255.0, blue: 15.0/255.0, alpha: 1.0)
                 default: break
@@ -232,7 +248,7 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
         }
         
         // Configure the slide-out menu
-        if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Phone {
+        if UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone {
             revealViewController().draggableBorderWidth = view.frame.width
             revealViewController().rearViewRevealWidth = view.frame.width * 0.7
             navigationController?.navigationBar.addGestureRecognizer(revealViewController().panGestureRecognizer())
@@ -245,20 +261,20 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
         switch ConfigurationManager.defaultTheme() {
             case "dark":
                 refreshControl?.backgroundColor = UIColor(red: 0.0/255.0, green: 174.0/255.0, blue: 239.0/255.0, alpha: 1.0)
-                refreshControl?.tintColor = UIColor.whiteColor()
+                refreshControl?.tintColor = UIColor.white
             case "light":
                 refreshControl?.backgroundColor = UIColor(red: 166.0/255.0, green: 37.0/255.0, blue: 15.0/255.0, alpha: 1.0)
-                refreshControl?.tintColor = UIColor.whiteColor()
+                refreshControl?.tintColor = UIColor.white
             default:
                 break
         }
         
-        refreshControl?.addTarget(self, action: #selector(FeedsViewController.refreshTableView), forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl?.addTarget(self, action: #selector(FeedsViewController.refreshTableView), for: UIControlEvents.valueChanged)
         
         // Add dropdown menu to navigation bar
-        navigationHeaderButton?.setTitle(feedsURLs[0]["name"]! + " ▾", forState: UIControlState.Normal);
+        navigationHeaderButton?.setTitle(feedsURLs[0]["name"]! + " ▾", for: UIControlState());
         navigationMenu.items = feedsMenuItems
-        navigationHeaderButton?.hidden = !ConfigurationManager.isDropdownMenuEnabled()
+        navigationHeaderButton?.isHidden = !ConfigurationManager.isDropdownMenuEnabled()
 
         // Define table view delegate
         tableView.dataSource = self.dataSource
@@ -273,60 +289,60 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
 
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         // Make sure the navigation bar is not hidden
         navigationController?.hidesBarsOnSwipe = false
         navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     // MARK: - Button handlers
-    @IBAction func navigationHeaderButtonDidPressed(sender: UIButton) {
+    @IBAction func navigationHeaderButtonDidPressed(_ sender: UIButton) {
         if !navigationMenu.isOpen {
-            navigationMenu.showFromNavigationController(self.navigationController);
+            navigationMenu.show(from: self.navigationController);
         } else {
             navigationMenu.close()
         }
     }
     
-    @IBAction func sideMenuButtonDidpressed(sender: UIBarButtonItem) {
-        if UIDevice.currentDevice().userInterfaceIdiom == UIUserInterfaceIdiom.Phone {
-            revealViewController().revealToggleAnimated(true)
+    @IBAction func sideMenuButtonDidpressed(_ sender: UIBarButtonItem) {
+        if UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.phone {
+            revealViewController().revealToggle(animated: true)
         }
     }
     
     // MARK: - Table reload handlers
-    func loadTableView(url: String!, title: String?) {
+    func loadTableView(_ url: String!, title: String?) {
         self.service?.getFeedsWithURL(url, completion: { [unowned self] (articles) -> () in
             // Table rows to delete
             let countOfCurrentArticles = self.dataSource?.articles.count
-            var indexPathsToDelete = [NSIndexPath]()
+            var indexPathsToDelete = [IndexPath]()
             for _index in 0..<countOfCurrentArticles! {
-                indexPathsToDelete.append(NSIndexPath(forRow: _index, inSection: 0))
+                indexPathsToDelete.append(IndexPath(row: _index, section: 0))
             }
 
             // Table rows to insert
-            var indexPathsToInsert = [NSIndexPath]()
+            var indexPathsToInsert = [IndexPath]()
             for row in 0..<articles.count {
-                indexPathsToInsert.append(NSIndexPath(forRow: row, inSection: 0))
+                indexPathsToInsert.append(IndexPath(row: row, section: 0))
             }
             
             // Update the table view to display the articles
             if indexPathsToInsert.count > 0 {
                 self.dataSource?.articles = articles
                 self.tableView.beginUpdates()
-                self.tableView.deleteRowsAtIndexPaths(indexPathsToDelete, withRowAnimation: .None)
-                self.tableView.insertRowsAtIndexPaths(indexPathsToInsert, withRowAnimation: .None)
+                self.tableView.deleteRows(at: indexPathsToDelete, with: .none)
+                self.tableView.insertRows(at: indexPathsToInsert, with: .none)
                 self.tableView.endUpdates()
             }
             
             // Scroll to the top of the table view
-            self.tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: UITableViewScrollPosition.Top, animated: true)
+            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: UITableViewScrollPosition.top, animated: true)
             
             
             // Hide refreshing control
-            if let isRefreshing = self.refreshControl?.refreshing {
+            if let isRefreshing = self.refreshControl?.isRefreshing {
                 if isRefreshing {
-                    NSOperationQueue.mainQueue().addOperationWithBlock({
+                    OperationQueue.main.addOperation({
                         self.refreshControl?.endRefreshing()
                     })
                 }
@@ -334,30 +350,30 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
             
             // let headerButton = self.navigationHeaderButton!
             if let menuTitle = title {
-                self.navigationHeaderButton?.setTitle(menuTitle + " ▾", forState: UIControlState.Normal)
+                self.navigationHeaderButton?.setTitle(menuTitle + " ▾", for: UIControlState())
                 self.navigationHeaderLabel?.text = menuTitle
             }
             
             // Enable banner ad
             if ConfigurationManager.isHomeScreenAdsEnabled() {
-                self.adBannerView?.loadRequest(GADRequest())
+                self.adBannerView?.load(GADRequest())
                 print("Request ad banner")
-                print("Ad unit ID: \(self.adBannerView?.adUnitID)")
+                print("Ad unit ID: \(self.adBannerView?.adUnitID ?? "")")
             }
 
-        }) { (error: NSError) -> (Void) in
+        }) { (error: Error) -> (Void) in
             print("Error: \(error.localizedDescription)", terminator: "")
             
             // Display alert
-            let alertController = UIAlertController(title: "Download Error", message: "Failed to retrieve articles from \(title!). Please try again later.", preferredStyle: UIAlertControllerStyle.Alert)
-            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: nil)
+            let alertController = UIAlertController(title: "Download Error", message: "Failed to retrieve articles from \(title!). Please try again later.", preferredStyle: UIAlertControllerStyle.alert)
+            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil)
             alertController.addAction(okAction)
-            self.presentViewController(alertController, animated: true, completion: nil)
+            self.present(alertController, animated: true, completion: nil)
 
             // Hide refreshing control
-            if let isRefreshing = self.refreshControl?.refreshing {
+            if let isRefreshing = self.refreshControl?.isRefreshing {
                 if isRefreshing {
-                    NSOperationQueue.mainQueue().addOperationWithBlock({
+                    OperationQueue.main.addOperation({
                         self.refreshControl?.endRefreshing()
                     })
                 }
@@ -372,27 +388,27 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
     }
     
     // Reload the table data from the selected feed
-    func refreshTableView() {
+    @objc func refreshTableView() {
         // Update last-update date
-        let dateFormatter = NSDateFormatter()
+        let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM d, h:mm a"
-        let currentDateTime = dateFormatter.stringFromDate(NSDate())
-        refreshControl?.attributedTitle = NSAttributedString(string: "Last Updated: \(currentDateTime)", attributes: [NSForegroundColorAttributeName: UIColor.whiteColor()])
+        let currentDateTime = dateFormatter.string(from: Date())
+        refreshControl?.attributedTitle = NSAttributedString(string: "Last Updated: \(currentDateTime)", attributes: [NSAttributedStringKey.foregroundColor: UIColor.white])
         
         loadTableView(currentFeeds?.url, title: currentFeeds?.title)
     }
 
     // MARK: - Segues
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
                 let destinationViewController:DetailArticleViewController
-                destinationViewController = segue.destinationViewController as! DetailArticleViewController
+                destinationViewController = segue.destination as! DetailArticleViewController
                 destinationViewController.article = dataSource?[indexPath.row] // selectedArticle
                 
                 // Use custom transition animator for Main_iPhone-2.storyboard
-                if self.storyboard!.valueForKey("name")! as! String == "Main_iPhone-2" {
-                    UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: UIStatusBarAnimation.Slide)
+                if self.storyboard!.value(forKey: "name")! as! String == "Main_iPhone-2" {
+                    UIApplication.shared.setStatusBarHidden(true, with: UIStatusBarAnimation.slide)
                     destinationViewController.transitioningDelegate = slideUpTransitionAnimator
                 }
             }
@@ -400,33 +416,33 @@ class FeedsViewController: UITableViewController, GADBannerViewDelegate {
 
     }
     
-    @IBAction func unwindToFeedScreen(segue: UIStoryboardSegue) {
-        if UIApplication.sharedApplication().statusBarHidden {
-            UIApplication.sharedApplication().setStatusBarHidden(false, withAnimation: UIStatusBarAnimation.Slide)
+    @IBAction func unwindToFeedScreen(_ segue: UIStoryboardSegue) {
+        if UIApplication.shared.isStatusBarHidden {
+            UIApplication.shared.setStatusBarHidden(false, with: UIStatusBarAnimation.slide)
         }
     }
     
     // MARK: - Google Admob
     
-    func adViewDidReceiveAd(bannerView: GADBannerView!) {
+    func adViewDidReceiveAd(_ bannerView: GADBannerView) {
         print("Banner loaded successfully")
 
         // Reset the content offset
-        tableView.contentOffset = CGPointMake(0, -tableView.contentInset.top)
+        tableView.contentOffset = CGPoint(x: 0, y: -tableView.contentInset.top)
 
         // Reposition the banner ad to create a slide down effect
-        let translateTransform = CGAffineTransformMakeTranslation(0, -bannerView.bounds.size.height)
+        let translateTransform = CGAffineTransform(translationX: 0, y: -bannerView.bounds.size.height)
         bannerView.transform = translateTransform
         
-        UIView.animateWithDuration(0.5) {
+        UIView.animate(withDuration: 0.5, animations: {
             self.tableView.tableHeaderView?.frame = bannerView.frame
-            bannerView.transform = CGAffineTransformIdentity
+            bannerView.transform = CGAffineTransform.identity
             self.tableView.tableHeaderView = bannerView
-        }
+        }) 
 
     }
     
-    func adView(bannerView: GADBannerView!, didFailToReceiveAdWithError error: GADRequestError!) {
+    func adView(_ bannerView: GADBannerView, didFailToReceiveAdWithError error: GADRequestError) {
         print("Fail to receive ads")
         print(error)
     }

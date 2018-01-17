@@ -9,7 +9,7 @@
 import UIKit
 
 protocol SectionHeaderViewDelegate {
-    func didSelectSectionHeaderView(cell:SectionHeaderView)
+    func didSelectSectionHeaderView(_ cell:SectionHeaderView)
 }
 
 class SectionHeaderView: UITableViewHeaderFooterView {
@@ -25,7 +25,7 @@ class SectionHeaderView: UITableViewHeaderFooterView {
 
     }
     
-    @IBAction func titleButtonTapped(sender: UIButton) {
+    @IBAction func titleButtonTapped(_ sender: UIButton) {
         delegate?.didSelectSectionHeaderView(self)
     }
     

@@ -14,11 +14,11 @@ extension NSMutableAttributedString {
         replaceAllStrings("<[^>]+>", replacement: "")
     }
     
-    func replaceAllStrings(pattern: String, replacement: String) {
-        var range = (self.string as NSString).rangeOfString(pattern, options: .RegularExpressionSearch)
+    func replaceAllStrings(_ pattern: String, replacement: String) {
+        var range = (self.string as NSString).range(of: pattern, options: .regularExpression)
         while range.location != NSNotFound {
-            self.replaceCharactersInRange(range, withString: replacement)
-            range = (self.string as NSString).rangeOfString(pattern, options: .RegularExpressionSearch)
+            self.replaceCharacters(in: range, with: replacement)
+            range = (self.string as NSString).range(of: pattern, options: .regularExpression)
         }
     }
 }

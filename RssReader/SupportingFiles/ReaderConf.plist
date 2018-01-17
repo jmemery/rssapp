@@ -7,9 +7,9 @@
 	<key>DropdownMenu</key>
 	<true/>
 	<key>HomeScreenAdsEnabled</key>
-	<false/>
+	<true/>
 	<key>DetailViewAdsEnabled</key>
-	<false/>
+	<true/>
 	<key>AdmobAppId</key>
 	<string>ca-app-pub-3940256099942544~1458002511</string>
 	<key>AdmobAdUnitId</key>
@@ -120,9 +120,9 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Gizmodo</string>
+			<string>Motherboard</string>
 			<key>url</key>
-			<string>http://feeds.gawker.com/gizmodo/full?format=xml</string>
+			<string>https://motherboard.vice.com/rss</string>
 		</dict>
 		<dict>
 			<key>name</key>
@@ -144,9 +144,9 @@
 		</dict>
 		<dict>
 			<key>name</key>
-			<string>Lifehacker</string>
+			<string>Vice</string>
 			<key>url</key>
-			<string>http://feeds.gawker.com/lifehacker/full#_ga=1.229767580.1417873084.1434605533?format=xml</string>
+			<string>https://www.vice.com/rss</string>
 		</dict>
 		<dict>
 			<key>name</key>
